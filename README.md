@@ -1,145 +1,160 @@
-# 🌤️ Taiwan Weather Forecast Dashboard
-### AI 創新微課程 — L3 CWA Weather App
+# Taiwan Weather GIS Dashboard
+## AIoT L3 — CWA HW1
 
-> **從氣象資料到互動式天氣預報應用**  
-> 用程式探索天氣・用資料看見台灣・用 AI 實現更多可能
+> **CWA Open Data → Database → Taiwan GIS → GitHub → Vercel**
 
----
+本作業以中央氣象署（CWA）真實 Open Data 為資料來源，從 API 資料取得開始，經過 ETL 與 SQLite 儲存，再建立本機 Taiwan GIS Web，最後推送 GitHub 並由 Vercel 自動部署。
 
-## 📖 課程簡介
+## 五大 Gate
 
-本專案是「AI 創新微課程」的第三單元，帶領學員從零開始，透過 **中央氣象署（CWA）Open Data API**，學習如何取得真實天氣資料、進行資料處理與儲存，並最終建立一個互動式台灣天氣預報 Web App。
+| Gate | 主題 | 核心成果 | PASS |
+|---|---|---|---|
+| 1 | CWA API | 取得真實 CWA JSON | API、欄位解析成功 |
+| 2 | Database | CWA → ETL → SQLite | SQL 可查到真實資料 |
+| 3 | Taiwan GIS Web | Database → Taiwan Map | 地圖位置可顯示氣象資料 |
+| 4 | GitHub | Local → GitHub | 原始碼安全推送 |
+| 5 | Vercel | GitHub → Vercel | Public Website 自動部署 |
 
----
+## 核心流程
 
-## 🛠️ 技術棧
-
-| 技術 | 用途 |
-|------|------|
-| **Python** | 主要程式語言 |
-| **CWA Open Data API** | 中央氣象署天氣資料來源 |
-| **JSON** | API 回傳資料格式解析 |
-| **Pandas** | 資料整理與預覽 |
-| **SQLite** | 本地資料庫儲存氣溫資料 |
-| **Streamlit** | 快速建立互動式 Web App |
-| **Folium** | 台灣地圖視覺化 |
-| **GitHub** | 版本管理與專案備份 |
-
----
-
-## 📚 課程大綱（共 24 節）
-
-### 🔹 Part 1：資料取得與解析
-1. **課程介紹** — 課程目標、學習地圖、專案成果展示
-2. **台灣的天氣與生活** — 天氣影響生活、資料驅動決策、智慧應用案例
-3. **中央氣象署 CWA Open Data 平台** — 註冊帳號、取得 API Key、選擇資料集
-4. **API 資料取得** — 使用 `requests` 取得 JSON 資料
-5. **JSON 資料結構解析** — 找到氣溫資料的位置（MinT / MaxT）
-6. **提取最高與最低氣溫** — 資料分析與處理
-
-### 🔹 Part 2：資料儲存與管理
-7. **資料整理與預覽** — 使用 Pandas 觀察資料
-8. **建立 SQLite 資料庫** — 儲存氣溫資料至 `data.db`
-9. **資料庫設計** — `TemperatureForecasts` 資料表架構
-10. **查詢資料驗證** — 使用 SQL 語法檢查資料正確性
-
-### 🔹 Part 3：Web App 開發
-11. **Streamlit 入門** — 安裝環境、基本結構、Hello World
-12. **從資料庫讀取資料** — 使用 SQL 查詢顯示氣溫
-13. **下拉選單選擇地區** — 互動式地區選擇
-14. **繪製折線圖** — 一週最高與最低氣溫視覺化
-15. **顯示資料表格** — 清楚呈現一週天氣預報資料
-16. **整合 Web App 介面** — 選地區看氣溫預報完整介面
-
-### 🔹 Part 4：進階功能與優化
-17. **進階：台灣地圖視覺化** — 使用 Folium × Streamlit
-18. **選擇日期顯示地圖** — 互動式天氣地圖
-19. **完整成果展示** — Taiwan Weather Dashboard
-20. **程式碼品質與優化** — 程式結構精簡、錯誤處理、重複執行不重複插入、良好的註解
-
-### 🔹 Part 5：發布與延伸
-21. **專案上傳至 GitHub** — 建立 Repository、連結 Git remote、Commit & Push
-22. **延伸應用與想法** — 天氣提醒 Line Bot、旅遊行程建議、農業 / 防災應用、結合 AI 做分析
-23. **回顧與重點整理** — API、JSON、Pandas、SQLite、Streamlit Web App、AI × Coding 實作流程
-24. **下一步：繼續探索** — 更多公開資料 API、AIoT 視覺化應用、打造自己的專業作品集
-
----
-
-## 🗄️ 資料庫結構
-
-```sql
-CREATE TABLE TemperatureForecasts (
-    id         INTEGER PRIMARY KEY,
-    regionName TEXT,
-    dataDate   TEXT,
-    min        REAL,
-    max        REAL
-);
+```text
+CWA Government Open Data
+        ↓
+     REST API
+        ↓
+       JSON
+        ↓
+ Parse / Clean / Transform
+        ↓
+      SQLite
+        ↓
+   Backend API
+        ↓
+Taiwan GIS Web
+Leaflet + OpenStreetMap + GeoJSON
+        ↓
+      GitHub
+        ↓
+      Vercel
+        ↓
+   Public Website
 ```
 
----
+## Gate 1 — CWA API
 
-## 🚀 快速開始
+只處理 CWA 資料取得。選定適合的 Forecast Dataset，從環境變數讀取 `CWA_API_KEY`，發送真實 HTTP request，解析實際 JSON schema，至少驗證 Location、Forecast Time、Weather、MinT、MaxT；若 Dataset 提供，再加入 PoP。
 
-### 1. 安裝相依套件
+**禁止 Mock/Fake weather data。** 不可在取得真實 response 前猜測 JSON schema。
 
-```bash
-pip install requests pandas streamlit folium streamlit-folium
+完成條件：`GATE 1 = PASS`
+
+## Gate 2 — Database
+
+將 Gate 1 的真實 CWA JSON 做 ETL：
+
+```text
+Extract → Transform → Load → SQLite
 ```
 
-### 2. 取得 CWA API Key
+Local Database 使用 SQLite。資料表至少保存地區、預報時間、天氣、最低溫、最高溫與資料取得時間。需定義避免重複資料的策略，並用 SQL SELECT 驗證。
 
-前往 [中央氣象署開放資料平台](https://opendata.cwa.gov.tw/) 註冊並申請 API Key。
+完成條件：`GATE 2 = PASS`
 
-### 3. 執行資料擷取
+## Gate 3 — Local Taiwan GIS Web
 
-```bash
-python fetch_weather.py
+先在 localhost 完成 GIS，再處理雲端部署。實作順序：
+
+```text
+3A Taiwan Map
+ → 3B One Location Marker
+ → 3C Weather Popup
+ → 3D Taiwan Locations
+ → 3E Database → GIS
+ → 3F Taiwan GeoJSON
+ → 3G Interactive Dashboard
 ```
 
-### 4. 啟動 Web App
+GIS 建議採 **Leaflet + OpenStreetMap + Taiwan GeoJSON**。Weather Data 必須來自 Database，不可 hard-code。
 
-```bash
-streamlit run app.py
+完成條件：`GATE 3 = PASS`
+
+## Gate 4 — GitHub
+
+Local Application 通過 Gate 3 後再整理並 Push。
+
+Push 前必須確認：
+
+- `.env` 未被 commit
+- Repository 中沒有 CWA API Key、password、token 或其他 secret
+- README 與設計文件完整
+- 專案可重新 clone 並依文件執行
+
+完成條件：`GATE 4 = PASS`
+
+## Gate 5 — Vercel Auto Deployment
+
+GitHub Repository 連接 Vercel，設定必要 Environment Variables，由 GitHub push 觸發 Vercel build/deploy。
+
+```text
+Code Change → Commit → Push → GitHub → Vercel → Auto Build → Auto Deploy
 ```
 
----
+注意：Local SQLite 適合 Gate 2–3 教學，但不可假設 Vercel local filesystem 是永久性 Production Database。若線上版需要持續寫入資料，Cloud Database 視為進階部署需求。
 
-## 📊 專案成果
+完成條件：`GATE 5 = PASS`
 
-- ✅ 自動從 CWA API 擷取全台各地區天氣預報
-- ✅ 將資料儲存至本地 SQLite 資料庫
-- ✅ 互動式地區選擇下拉選單
-- ✅ 一週氣溫折線圖視覺化
-- ✅ 台灣地圖熱力圖（Folium）
-- ✅ 完整 Streamlit Web Dashboard
+## Security
 
----
+真正的 CWA Key 只能存在 Local `.env` 與部署平台的 Environment Variables。
 
-## 📁 專案結構
-
-```
-L3 CWA/
-├── fetch_weather.py      # 從 CWA API 取得天氣資料
-├── app.py                # Streamlit Web App 主程式
-├── data.db               # SQLite 資料庫
-├── requirements.txt      # Python 相依套件清單
-└── README.md             # 本文件
+```env
+CWA_API_KEY=YOUR_CWA_API_KEY
 ```
 
----
+`.gitignore` 至少包含：
 
-## 👨‍🏫 講師
+```gitignore
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+```
 
-**煥哥（Huan）**  
-> 「技術可以解決問題，但更重要的是，用技術創造更好的未來！」
+若 Secret 曾被 commit，必須視為 exposed 並 rotate，不能只刪檔案。
 
-- GitHub: [@huanchen1107](https://github.com/huanchen1107)
-- Email: huanchen1107@email.com
+## Development Rule
 
----
+**DO NOT BUILD EVERYTHING AT ONCE.**
 
-## 📄 授權
+每一 Gate 都必須：
 
-本專案為教學用途，歡迎學習參考。  
-*AI for Learning, AI for a Better Taiwan* 🇹🇼
+```text
+BUILD → RUN → TEST → VERIFY → PASS → NEXT GATE
+```
+
+Gate FAIL 就停在該 Gate 修正，不得自行跳到下一 Gate。
+
+## Definition of Done
+
+```text
+[ PASS ] Gate 1 — CWA API
+          ↓
+[ PASS ] Gate 2 — Database
+          ↓
+[ PASS ] Gate 3 — Local Taiwan GIS
+          ↓
+[ PASS ] Gate 4 — GitHub
+          ↓
+[ PASS ] Gate 5 — Vercel
+          ↓
+Taiwan Weather GIS Dashboard COMPLETE
+```
+
+## Learning Path
+
+這份 HW1 串起五個重要概念：
+
+**Data Acquisition → Data Engineering → GIS Data Application → Software Engineering → Cloud / CI/CD**
+
+詳細設計與驗收規範見 `design.md`。
