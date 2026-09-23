@@ -45,6 +45,10 @@ function getRainColor(r) {
 async function loadData() {
     try {
         const res = await fetch('/api/weather');
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`HTTP error! status: ${res.status}, body: ${errText}`);
+        }
         weatherData = await res.json();
 
         if (weatherData.length > 0) {
@@ -53,7 +57,7 @@ async function loadData() {
             renderMarkers();
         }
     } catch (e) {
-        console.error("Failed to load weather data", e);
+        console.error("Failed to load weather data:", e);
     }
 }
 

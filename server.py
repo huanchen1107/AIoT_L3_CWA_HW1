@@ -10,7 +10,8 @@ CORS(app)
 
 def get_db_connection():
     db_path = os.path.join(BASE_DIR, 'data.db')
-    conn = sqlite3.connect(db_path)
+    # Vercel filesystem is Read-Only. Must connect to SQLite in read-only mode.
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     conn.row_factory = sqlite3.Row
     return conn
 
