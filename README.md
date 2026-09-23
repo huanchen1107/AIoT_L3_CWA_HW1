@@ -10,7 +10,7 @@
 | Gate | 主題 | 狀態 | 備註 |
 |---|---|---|---|
 | 1 | CWA API | ✅ **PASS** | F-D0047-091, 22縣市, 7天, T/MaxT/MinT/Wx/PoP 全驗證 |
-| 2 | Database | ⬜ 待開始 | Gate 1 PASS 後方可進行 |
+| 2 | Database | ✅ **PASS** | 成功載入 SQLite (data.db)，308筆預報資料 |
 | 3 | Taiwan GIS Web | ⬜ 待開始 | Gate 2 PASS 後方可進行 |
 | 4 | GitHub | ⬜ 待開始 | Gate 3 PASS 後方可進行 |
 | 5 | Vercel | ⬜ 待開始 | Gate 4 PASS 後方可進行 |
@@ -74,17 +74,27 @@ records.Locations[0].Location[]
 
 **Output：** `gate1_output.json` (22 counties, no secrets)
 
-## Gate 2 — Database
+## Gate 2 — Database ✅ PASS
 
-將 Gate 1 的真實 CWA JSON 做 ETL：
+**驗證日期：** 2026-09-23  
+**資料庫檔案：** `data.db` (SQLite)  
+**資料表：** `weather_forecasts`
 
+已將 Gate 1 的真實 CWA JSON 做 ETL 處理。
+設計 Duplicate Strategy 採用 `UNIQUE(location_name, forecast_start)` 與 `INSERT OR REPLACE` 策略。
+
+**Gate 2 驗證結果 (SQL SELECT)：**
+- 成功插入/更新 `308` 筆預報紀錄，涵蓋所有 `22` 縣市，符合 7 天 (14個 12 小時區段) 資料量 (22 × 14 = 308)。
+
+**Gate 2 PASS Checklist：**
 ```text
-Extract → Transform → Load → SQLite
+[PASS] Read JSON output from Gate 1
+[PASS] SQLite schema configured
+[PASS] Duplicate strategy (UNIQUE/REPLACE) implemented
+[PASS] ETL process successful
+[PASS] Verified via SQL SELECT
+[PASS] No GIS work started
 ```
-
-Local Database 使用 SQLite。資料表至少保存地區、預報時間、天氣、最低溫、最高溫與資料取得時間。需定義避免重複資料的策略，並用 SQL SELECT 驗證。
-
-完成條件：`GATE 2 = PASS`
 
 ## Gate 3 — Local Taiwan GIS Web
 
@@ -166,7 +176,7 @@ Gate FAIL 就停在該 Gate 修正，不得自行跳到下一 Gate。
 ```text
 [✅ PASS] Gate 1 — CWA API          (2026-09-23)
               ↓
-[⬜ TODO ] Gate 2 — Database
+[✅ PASS] Gate 2 — Database         (2026-09-23)
               ↓
 [⬜ TODO ] Gate 3 — Local Taiwan GIS
               ↓
