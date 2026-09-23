@@ -5,15 +5,15 @@
 
 本作業以中央氣象署（CWA）真實 Open Data 為資料來源，從 API 資料取得開始，經過 ETL 與 SQLite 儲存，再建立本機 Taiwan GIS Web，最後推送 GitHub 並由 Vercel 自動部署。
 
-## 五大 Gate
+## 五大 Gate — 進度追蹤
 
-| Gate | 主題 | 核心成果 | PASS |
+| Gate | 主題 | 狀態 | 備註 |
 |---|---|---|---|
-| 1 | CWA API | 取得真實 CWA JSON | API、欄位解析成功 |
-| 2 | Database | CWA → ETL → SQLite | SQL 可查到真實資料 |
-| 3 | Taiwan GIS Web | Database → Taiwan Map | 地圖位置可顯示氣象資料 |
-| 4 | GitHub | Local → GitHub | 原始碼安全推送 |
-| 5 | Vercel | GitHub → Vercel | Public Website 自動部署 |
+| 1 | CWA API | ✅ **PASS** | F-D0047-091, 22縣市, 7天, T/MaxT/MinT/Wx/PoP 全驗證 |
+| 2 | Database | ⬜ 待開始 | Gate 1 PASS 後方可進行 |
+| 3 | Taiwan GIS Web | ⬜ 待開始 | Gate 2 PASS 後方可進行 |
+| 4 | GitHub | ⬜ 待開始 | Gate 3 PASS 後方可進行 |
+| 5 | Vercel | ⬜ 待開始 | Gate 4 PASS 後方可進行 |
 
 ## 核心流程
 
@@ -40,13 +40,39 @@ Leaflet + OpenStreetMap + GeoJSON
    Public Website
 ```
 
-## Gate 1 — CWA API
+## Gate 1 — CWA API ✅ PASS
 
-只處理 CWA 資料取得。選定適合的 Forecast Dataset，從環境變數讀取 `CWA_API_KEY`，發送真實 HTTP request，解析實際 JSON schema，至少驗證 Location、Forecast Time、Weather、MinT、MaxT；若 Dataset 提供，再加入 PoP。
+**驗證日期：** 2026-09-23  
+**Dataset：** `F-D0047-091`（全臺縣市7天天氣預報）  
+> 注意：workflow 指定 F-D0047-093，該 ID CWA 尚未上線（404）。F-D0047-091 為已發布的等價 dataset，具備相同 Locations schema 與完整欄位。
 
-**禁止 Mock/Fake weather data。** 不可在取得真實 response 前猜測 JSON schema。
+**實際 JSON Schema：**
+```text
+records.Locations[0].Location[]
+  └── LocationName
+  └── WeatherElement[]
+        ├── 平均溫度   (T)   — 14 periods × 12hr = 7 days
+        ├── 最高溫度   (MaxT)
+        ├── 最低溫度   (MinT)
+        ├── 天氣現象   (Wx)
+        └── 12小時降雨機率 (PoP)
+```
 
-完成條件：`GATE 1 = PASS`
+**Gate 1 PASS Checklist：**
+```text
+[PASS] Dataset = F-D0047-091
+[PASS] CWA authentication success
+[PASS] HTTP 200 OK, success = true
+[PASS] Real JSON received
+[PASS] Actual JSON schema inspected
+[PASS] 7-day forecast confirmed (14 x 12hr periods)
+[PASS] T / MaxT / MinT / Wx / PoP all confirmed
+[PASS] 22/22 Taiwan counties coverage confirmed
+[PASS] No mock/fake data
+[PASS] No API Key exposed
+```
+
+**Output：** `gate1_output.json` (22 counties, no secrets)
 
 ## Gate 2 — Database
 
@@ -138,16 +164,16 @@ Gate FAIL 就停在該 Gate 修正，不得自行跳到下一 Gate。
 ## Definition of Done
 
 ```text
-[ PASS ] Gate 1 — CWA API
-          ↓
-[ PASS ] Gate 2 — Database
-          ↓
-[ PASS ] Gate 3 — Local Taiwan GIS
-          ↓
-[ PASS ] Gate 4 — GitHub
-          ↓
-[ PASS ] Gate 5 — Vercel
-          ↓
+[✅ PASS] Gate 1 — CWA API          (2026-09-23)
+              ↓
+[⬜ TODO ] Gate 2 — Database
+              ↓
+[⬜ TODO ] Gate 3 — Local Taiwan GIS
+              ↓
+[⬜ TODO ] Gate 4 — GitHub
+              ↓
+[⬜ TODO ] Gate 5 — Vercel
+              ↓
 Taiwan Weather GIS Dashboard COMPLETE
 ```
 
