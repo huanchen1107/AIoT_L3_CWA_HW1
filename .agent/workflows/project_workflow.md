@@ -1,60 +1,95 @@
 ---
-description: Taiwan Weather Forecast project - full development workflow
+description: AIoT L3 CWA HW1 — strict five-gate development workflow
 ---
 
-# Taiwan Weather Forecast — Project Workflow
+# Taiwan Weather GIS — Antigravity Workflow
 
-## 1. Setup Environment
-Install all required Python packages.
+## Governing Rule
 
-```bash
-pip install requests pandas streamlit folium streamlit-folium
+嚴格依序執行：
+
+```text
+Gate 1 CWA API
+ → Gate 2 Database
+ → Gate 3 Local Taiwan GIS
+ → Gate 4 GitHub
+ → Gate 5 Vercel
 ```
 
-## 2. Fetch Weather Data from CWA API
-Run the data fetch script to pull latest weather data and store it in SQLite.
+**DO NOT BUILD EVERYTHING AT ONCE.**
 
-```bash
-python fetch_weather.py
+每個 Gate 必須 `BUILD → RUN → TEST → VERIFY → PASS`。FAIL 時停留在該 Gate 修正。不得使用 mock/fake weather data。
+
+## Gate 1 — CWA API
+
+Goal: 從 CWA Open Data API 取得真實 Forecast JSON。
+
+1. 確認 Dataset 與 endpoint。
+2. 從 `.env` 讀取 `CWA_API_KEY`；不得輸出完整 key。
+3. 發送真實 HTTP request。
+4. 驗證 HTTP status。
+5. 依實際 response 解析 JSON，不猜 schema。
+6. 先驗證一個地區，例如臺中市。
+7. 輸出 Location、Forecast Time、Weather、MinT、MaxT；Dataset 有提供時再輸出 PoP。
+8. 確認後續所需其他台灣地區也存在。
+9. 實際 RUN 並留下驗證結果。
+
+禁止實作 Database、GIS、GitHub deployment、Vercel。
+
+只有全部成功才回報：`GATE 1 = PASS`。
+
+## Gate 2 — Database
+
+前提：Gate 1 PASS。
+
+將真實 CWA response 做 ETL 並存入 SQLite。建立 schema、資料驗證與 duplicate strategy，以 SQL SELECT 驗證指定地區及多地區資料。
+
+禁止開始 GIS。
+
+完成才回報：`GATE 2 = PASS`。
+
+## Gate 3 — Local Taiwan GIS
+
+前提：Gate 2 PASS。
+
+依序完成：
+
+```text
+3A Taiwan Map
+3B One Marker
+3C Weather Popup
+3D Taiwan Locations
+3E Database → GIS
+3F Taiwan GeoJSON
+3G Interactive Dashboard
 ```
 
-## 3. Verify Database
-Check that data was inserted correctly.
+GIS 優先使用 Leaflet + OpenStreetMap + Taiwan GeoJSON。Weather 必須來自 Database。
 
-```bash
-python -c "import sqlite3; conn = sqlite3.connect('data.db'); print(conn.execute('SELECT * FROM TemperatureForecasts LIMIT 5').fetchall())"
-```
+完成才回報：`GATE 3 = PASS`。
 
-## 4. Run the Streamlit Web App
-Launch the interactive dashboard locally.
+## Gate 4 — GitHub
 
-```bash
-streamlit run app.py
-```
+前提：Gate 3 PASS。
 
-Open browser at: http://localhost:8501
+整理 repository、README/design、requirements 與安全設定。Push 前確認 `.env` 與任何 secret 不在 Git history/current files。
 
-## 5. Git — Stage & Commit Changes
-After making changes, commit them with a meaningful message.
+完成才回報：`GATE 4 = PASS`。
 
-```bash
-git add .
-git commit -m "your message here"
-```
+## Gate 5 — Vercel
 
-## 6. Git — Push to GitHub
-Push committed changes to the remote repository.
+前提：Gate 4 PASS。
 
-```bash
-git push origin main
-```
+連接 GitHub → Vercel，設定 Environment Variables，完成 build/deploy，驗證 public URL，並測試後續 GitHub push 能觸發 auto deployment。
 
-## 7. Full Update Cycle (fetch → verify → commit → push)
-Run this sequence to update data and sync with GitHub.
+Local SQLite 不視為 Vercel 的永久 Production Database；若需要線上持續寫入，另採 Cloud Database。
 
-```bash
-python fetch_weather.py
-git add .
-git commit -m "Update weather data"
-git push origin main
+完成才回報：`GATE 5 = PASS`。
+
+## Final
+
+只有五 Gate 全 PASS 才回報：
+
+```text
+DIC-2 / AIoT L3 CWA HW1 = COMPLETE
 ```
