@@ -86,8 +86,11 @@ def run_etl(conn):
             pop = None
             if elements.get("PoP") and i < len(elements["PoP"]):
                 pop_val = elements["PoP"][i].get("value")
-                if pop_val and pop_val.strip() and pop_val != " ":
-                    pop = float(pop_val)
+                if pop_val and pop_val.strip() and pop_val.strip() not in ("-", ""):
+                    try:
+                        pop = float(pop_val)
+                    except ValueError:
+                        pop = None
                     
             rows_to_insert.append((
                 loc, lat, lon, start, end, wx, mint, maxt, pop, source, fetched_at

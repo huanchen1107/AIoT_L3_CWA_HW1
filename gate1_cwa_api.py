@@ -108,7 +108,12 @@ def parse_county(county: dict) -> dict:
             times = []
             for t in elem.get("Time", []):
                 ev = t.get("ElementValue", [{}])
-                value = ev[0].get("Value") if ev else None
+                
+                # Fetch first available value dynamically rather than relying on a hardcoded 'Value' key
+                value = None
+                if ev and isinstance(ev[0], dict) and len(ev[0]) > 0:
+                    value = list(ev[0].values())[0]
+                
                 times.append({
                     "start": t.get("StartTime"),
                     "end":   t.get("EndTime"),
