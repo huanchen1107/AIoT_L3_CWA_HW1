@@ -4,11 +4,13 @@ import sqlite3
 import pandas as pd
 import os
 
-app = Flask(__name__, static_folder='static')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'static'))
 CORS(app)
 
 def get_db_connection():
-    conn = sqlite3.connect('data.db')
+    db_path = os.path.join(BASE_DIR, 'data.db')
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 

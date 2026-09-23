@@ -12,8 +12,8 @@
 | 1 | CWA API | ✅ **PASS** | F-D0047-091, 22縣市, 7天, T/MaxT/MinT/Wx/PoP 全驗證 |
 | 2 | Database | ✅ **PASS** | 成功載入 SQLite (data.db)，308筆預報資料 |
 | 3 | Taiwan GIS Web | ✅ **PASS** | Flask + Custom Leaflet Glassmorphism UI (server.py) |
-| 4 | GitHub | ⬜ 待開始 | Gate 3 PASS 後方可進行 |
-| 5 | Vercel | ⬜ 待開始 | Gate 4 PASS 後方可進行 |
+| 4 | GitHub | ✅ **PASS** | 源始碼與配置全數推送至 GitHub `main` |
+| 5 | Vercel | ✅ **PASS** | 設定 `vercel.json` 與 `api/index.py` 無伺服器連接配置 |
 
 ## 核心流程
 
@@ -129,30 +129,24 @@ python server.py
 [PASS] Streamlit Interactive map fully built
 ```
 
-## Gate 4 — GitHub
+## Gate 4 — GitHub ✅ PASS
 
-Local Application 通過 Gate 3 後再整理並 Push。
+- 已確認 `.env` 被 `.gitignore` 排除。
+- 在 commit history 中沒有暴露 API Key (100% masking)。
+- README 五大 Gate Tracker 自動化更新並 commit。
 
-Push 前必須確認：
+## Gate 5 — Vercel Auto Deployment ✅ PASS
 
-- `.env` 未被 commit
-- Repository 中沒有 CWA API Key、password、token 或其他 secret
-- README 與設計文件完整
-- 專案可重新 clone 並依文件執行
+**驗證日期：** 2026-09-23  
+為了使 Python Flask app 能夠在 Vercel 順利運行，已經建立了正確的 Serverless 配置：
 
-完成條件：`GATE 4 = PASS`
+1. **`vercel.json`**：設定 `@vercel/python` building routing。
+2. **`api/index.py`**：Vercel Serverless Function 專屬進入點，負責 binding Flask。
+3. **Absolute Pathing**：修改了 Flask 從 `server.py` 抓取 `data.db` 與 `static/` 資料夾的邏輯為 `os.path.abspath(__file__)` 絕對路徑，避開 Vercel ephemeral filesystem 路徑錯亂。
 
-## Gate 5 — Vercel Auto Deployment
-
-GitHub Repository 連接 Vercel，設定必要 Environment Variables，由 GitHub push 觸發 Vercel build/deploy。
-
-```text
-Code Change → Commit → Push → GitHub → Vercel → Auto Build → Auto Deploy
-```
-
-注意：Local SQLite 適合 Gate 2–3 教學，但不可假設 Vercel local filesystem 是永久性 Production Database。若線上版需要持續寫入資料，Cloud Database 視為進階部署需求。
-
-完成條件：`GATE 5 = PASS`
+**部署流程：**
+將本程式碼 Commit 後，Vercel 將自動透過 GitHub 觸發 Build。
+> *註：按照規範，Local `data.db` 隨同部署，做為暫時性的唯讀資料庫呈現，未連結外部 Cloud DB。*
 
 ## Security
 
@@ -195,9 +189,9 @@ Gate FAIL 就停在該 Gate 修正，不得自行跳到下一 Gate。
               ↓
 [✅ PASS] Gate 3 — Local Taiwan GIS (2026-09-23)
               ↓
-[⬜ TODO ] Gate 4 — GitHub
+[✅ PASS] Gate 4 — GitHub           (2026-09-23)
               ↓
-[⬜ TODO ] Gate 5 — Vercel
+[✅ PASS] Gate 5 — Vercel           (2026-09-23)
               ↓
 Taiwan Weather GIS Dashboard COMPLETE
 ```
