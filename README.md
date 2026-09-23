@@ -11,7 +11,7 @@
 |---|---|---|---|
 | 1 | CWA API | ✅ **PASS** | F-D0047-091, 22縣市, 7天, T/MaxT/MinT/Wx/PoP 全驗證 |
 | 2 | Database | ✅ **PASS** | 成功載入 SQLite (data.db)，308筆預報資料 |
-| 3 | Taiwan GIS Web | ✅ **PASS** | Streamlit + Folium 互動地圖 (app.py) |
+| 3 | Taiwan GIS Web | ✅ **PASS** | Flask + Custom Leaflet Glassmorphism UI (server.py) |
 | 4 | GitHub | ⬜ 待開始 | Gate 3 PASS 後方可進行 |
 | 5 | Vercel | ⬜ 待開始 | Gate 4 PASS 後方可進行 |
 
@@ -99,22 +99,25 @@ records.Locations[0].Location[]
 ## Gate 3 — Local Taiwan GIS Web ✅ PASS
 
 **驗證日期：** 2026-09-23  
-**Web App 技術：** Streamlit + Folium (`streamlit-folium`)  
-**程式碼檔案：** `app.py`  
+**Web App 技術：** Python Flask (API) + Vanilla JS / Leaflet (前端) + Custom Tailwind-style CSS  
+**前端檔案：** `static/index.html`, `static/style.css`, `static/script.js`
+**後端檔案：** `server.py`  
 
-依據專案設計順序實作完成：
-1. **Taiwan Map:** 載入 Folium 的 OpenStreetMap 底圖，置中對齊全台。
-2. **Multiple Locations & Marker:** 使用自建立的 `COORDINATES` 取代 CWA 未提供的經緯度，精確點出所有 22 個縣市。
-3. **Weather Popup:** 點擊 Marker 顯示地點、天氣狀況、最高與最低氣溫與降雨機率。
-4. **Database Integration:** 嚴格遵循要求，資料100%從 `data.db` 載入，沒有任何 hard-code 的氣候預報資料。
-5. **Interactive Dashboard:** 
-   - 側邊欄提供地區 (Location) 與預報時間 (Forecast Time) 過濾。
-   - 高溫智慧變色 Marker：紅色 (>=32°C)、橘色 (>=28°C)、綠色 (常溫)、藍色 (<20°C)。
-   - 提供 7 天預報折線圖與完整表格。
+依據專案設計順序與指定參考版型實作完成：
+1. **Taiwan Map:** 載入 Folium/Leaflet 的 OpenStreetMap 與 Carto Dark 底圖，置中對齊全台。
+2. **Glassmorphism UI:** 實作精確的深色半透明玻璃質感 Sidebar 與 Dashboard。
+3. **Multiple Locations & Marker:** 透過 `COORDINATES` 取代 CWA 未提供的經緯度，以自訂的 Pill Marker 精確標示全台 22 縣市。
+4. **Weather Popup:** 點擊 Marker 顯示地點、天氣狀況、最高與最低氣溫與降雨機率。
+5. **Database Integration:** 嚴格遵循要求，資料100%由 Flask 後端 `api/weather` 從 `data.db` 取出，沒有任何 hard-code 的氣候預報資料。
+6. **Interactive Dashboard:** 
+   - 漸層圖例對應溫度與降雨顏色。
+   - 支援圖層切換：溫度標籤 vs 降雨機率標籤。
+   - 支援底圖切換：深色模式 vs 街道圖。
 
 **執行方式：**
 ```bash
-streamlit run app.py
+python server.py
+# 然後開啟 http://127.0.0.1:5000
 ```
 
 **Gate 3 PASS Checklist：**

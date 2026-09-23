@@ -1,6 +1,5 @@
 requests
 python-dotenv
 pandas
-streamlit
-folium
-streamlit-folium
+flask
+flask-cors
