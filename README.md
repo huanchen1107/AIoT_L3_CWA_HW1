@@ -3,6 +3,9 @@
 
 > **CWA Open Data → Database → Taiwan GIS → GitHub → Vercel**
 
+Live demo website: https://cwa2026.vercel.app/
+![Live Demo Snapshot](docs/demo.png)
+
 本作業以中央氣象署（CWA）真實 Open Data 為資料來源，從 API 資料取得開始，經過 ETL 與 SQLite 儲存，再建立本機 Taiwan GIS Web，最後推送 GitHub 並由 Vercel 自動部署。
 
 ## 五大 Gate — 進度追蹤
