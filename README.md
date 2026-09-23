@@ -11,7 +11,7 @@
 |---|---|---|---|
 | 1 | CWA API | ✅ **PASS** | F-D0047-091, 22縣市, 7天, T/MaxT/MinT/Wx/PoP 全驗證 |
 | 2 | Database | ✅ **PASS** | 成功載入 SQLite (data.db)，308筆預報資料 |
-| 3 | Taiwan GIS Web | ⬜ 待開始 | Gate 2 PASS 後方可進行 |
+| 3 | Taiwan GIS Web | ✅ **PASS** | Streamlit + Folium 互動地圖 (app.py) |
 | 4 | GitHub | ⬜ 待開始 | Gate 3 PASS 後方可進行 |
 | 5 | Vercel | ⬜ 待開始 | Gate 4 PASS 後方可進行 |
 
@@ -96,23 +96,35 @@ records.Locations[0].Location[]
 [PASS] No GIS work started
 ```
 
-## Gate 3 — Local Taiwan GIS Web
+## Gate 3 — Local Taiwan GIS Web ✅ PASS
 
-先在 localhost 完成 GIS，再處理雲端部署。實作順序：
+**驗證日期：** 2026-09-23  
+**Web App 技術：** Streamlit + Folium (`streamlit-folium`)  
+**程式碼檔案：** `app.py`  
 
-```text
-3A Taiwan Map
- → 3B One Location Marker
- → 3C Weather Popup
- → 3D Taiwan Locations
- → 3E Database → GIS
- → 3F Taiwan GeoJSON
- → 3G Interactive Dashboard
+依據專案設計順序實作完成：
+1. **Taiwan Map:** 載入 Folium 的 OpenStreetMap 底圖，置中對齊全台。
+2. **Multiple Locations & Marker:** 使用自建立的 `COORDINATES` 取代 CWA 未提供的經緯度，精確點出所有 22 個縣市。
+3. **Weather Popup:** 點擊 Marker 顯示地點、天氣狀況、最高與最低氣溫與降雨機率。
+4. **Database Integration:** 嚴格遵循要求，資料100%從 `data.db` 載入，沒有任何 hard-code 的氣候預報資料。
+5. **Interactive Dashboard:** 
+   - 側邊欄提供地區 (Location) 與預報時間 (Forecast Time) 過濾。
+   - 高溫智慧變色 Marker：紅色 (>=32°C)、橘色 (>=28°C)、綠色 (常溫)、藍色 (<20°C)。
+   - 提供 7 天預報折線圖與完整表格。
+
+**執行方式：**
+```bash
+streamlit run app.py
 ```
 
-GIS 建議採 **Leaflet + OpenStreetMap + Taiwan GeoJSON**。Weather Data 必須來自 Database，不可 hard-code。
-
-完成條件：`GATE 3 = PASS`
+**Gate 3 PASS Checklist：**
+```text
+[PASS] Local Map displaying Taiwan
+[PASS] Locations matched and parsed to map
+[PASS] Popups showing correct Weather & Temperature
+[PASS] Data successfully read from SQLite Gate 2 DB
+[PASS] Streamlit Interactive map fully built
+```
 
 ## Gate 4 — GitHub
 
@@ -178,7 +190,7 @@ Gate FAIL 就停在該 Gate 修正，不得自行跳到下一 Gate。
               ↓
 [✅ PASS] Gate 2 — Database         (2026-09-23)
               ↓
-[⬜ TODO ] Gate 3 — Local Taiwan GIS
+[✅ PASS] Gate 3 — Local Taiwan GIS (2026-09-23)
               ↓
 [⬜ TODO ] Gate 4 — GitHub
               ↓
