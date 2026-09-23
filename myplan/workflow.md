@@ -164,7 +164,7 @@ Local SQLite 不視為 Vercel 的永久 Production Database；若需要線上持
 只有五 Gate 全 PASS 才回報：
 
 ```text
-DIC-2 / AIoT L3 CWA HW1 = COMPLETE
+DIC-2 / AIoT L3 CWA HW1 = COMPLETE    (2026-09-23)
 ```
 
 ## Current Baseline

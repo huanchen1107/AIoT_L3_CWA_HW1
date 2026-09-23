@@ -194,6 +194,7 @@ Gate FAIL 就停在該 Gate 修正，不得自行跳到下一 Gate。
 [✅ PASS] Gate 5 — Vercel           (2026-09-23)
               ↓
 Taiwan Weather GIS Dashboard COMPLETE
+DIC-2 / AIoT L3 CWA HW1 = COMPLETE
 ```
 
 ## Learning Path
